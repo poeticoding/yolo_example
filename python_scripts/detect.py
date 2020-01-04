@@ -65,7 +65,7 @@ def run(model):
 
 if __name__ == "__main__":
     model = "yolov3"
-    if sys.argc > 1: 
+    if len(sys.argv) > 1: 
         model = sys.argv[1]
         
     run(model)
