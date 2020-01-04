@@ -9,9 +9,9 @@ defmodule Yolo.Application do
     # List all child processes to be supervised
     children = [
       # Start the endpoint when the application starts
-      YoloWeb.Endpoint
+      YoloWeb.Endpoint,
       # Starts a worker by calling: Yolo.Worker.start_link(arg)
-      # {Yolo.Worker, arg},
+      {Yolo.Worker, [name: Yolo.Worker]},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

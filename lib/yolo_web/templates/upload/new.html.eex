@@ -1,0 +1,12 @@
+<%= form_for @conn, Routes.upload_path(@conn, :create), [multipart: true], fn f-> %>
+
+    <div class="upload-btn-wrapper">
+        <button class="button button-outline">Select an Image</button>
+        <%= file_input f, :upload, class: "form-control" %>
+    </div>
+
+    <div>
+        <%= submit "Detect", class: "button"%>
+    </div>
+<% end %>
+

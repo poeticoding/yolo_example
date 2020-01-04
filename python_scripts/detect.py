@@ -1,4 +1,4 @@
-import os
+import os, sys
 from struct import unpack, pack
 import numpy as np
 import cv2
@@ -25,28 +25,47 @@ def read_image(input):
     image_id = input.read(UUID4_SIZE).decode("ascii")
     image_data = input.read(length - UUID4_SIZE)
 
-    return {'id': image_id, 'data': image_data}
+    # converting the binary to a opencv image
+    nparr = np.fromstring(image_data, np.uint8)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-def detect(image):
-    nparr = np.fromstring(image, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    boxes, labels, _conf = cv.detect_common_objects(img, model="yolov3")
+    return {'id': image_id, 'image': image}
+
+def detect(image, model):
+    boxes, labels, _conf = cv.detect_common_objects(image, model=model)
     return boxes, labels
 
-def write_result(output, image_id, boxes, labels):
-    result = json.dumps({'id': image_id, 'boxes': boxes, 'labels': labels}).encode("ascii")
+def write_result(output, image_id, image_shape, boxes, labels):
+    result = json.dumps({
+        'id': image_id, 'shape': image_shape,
+        'boxes': boxes, 'labels': labels
+    }).encode("ascii")
+
     header = pack("!I", len(result))
     output.write(header)
     output.write(result)
     output.flush()
 
-def run():
+def run(model):
     input, output = setup_io()
     
     while True:
         image = read_image(input)
         if image is None: break
-        boxes, labels = detect(image["data"])
-        write_result(output, image["id"], boxes, labels)
+        
+        #image shape
+        height, width, _ = image["image"].shape
+        shape = {'width': width, 'height': height}
 
-run()
+        #detect object
+        boxes, labels = detect(image["image"], model)
+
+        #send result back to elixir
+        write_result(output, image["id"], shape, boxes, labels)
+
+if __name__ == "__main__":
+    model = "yolov3"
+    if sys.argc > 1: 
+        model = sys.argv[1]
+        
+    run(model)

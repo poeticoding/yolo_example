@@ -1,0 +1,49 @@
+.upload-progress {
+    position: relative;
+}
+
+
+progress {
+    display: none;
+    position:relative;
+    width: 100%;
+    height: 25px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+
+progress::-webkit-progress-bar {
+    background-color: #eee;
+    border-radius: 8px;
+}
+
+progress::-webkit-progress-value {
+    background-color: #276bd1;
+    border-radius: 8px;
+}
+
+label.progress-percentage {
+    position: absolute;
+    top: 0;
+    text-align: center;
+    width: 100%;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #444;
+}
+
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.upload-btn-wrapper input[type=file] {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
