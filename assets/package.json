@@ -8,7 +8,8 @@
   "dependencies": {
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
-    "jquery": "3.4.1"
+    "jquery": "^3.4.1",
+    "msgpack-lite": "^0.1.26"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

@@ -19,6 +19,7 @@ defmodule YoloWeb.Router do
     get "/", PageController, :index
 
     resources "/uploads", UploadController, only: [:new, :create]
+    get "/webcam", WebcamController, :index
   end
 
   # Other scopes may use custom stacks.

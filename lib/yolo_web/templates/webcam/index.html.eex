@@ -1,0 +1,5 @@
+<video autoplay></video>
+<canvas style="display:none;"></canvas>
+
+<button id="toggle_button">Start/Stop</button>
+
