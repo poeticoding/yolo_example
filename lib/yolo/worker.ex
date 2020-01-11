@@ -1,6 +1,13 @@
 defmodule Yolo.Worker do
   use GenServer
 
+  @uuid4_size 16
+
+  @models %{
+    "yolov3" => <<0>>,
+    "yolov3-tiny" => <<1>>
+  }
+
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
@@ -8,38 +15,37 @@ defmodule Yolo.Worker do
   def init(:ok) do
     python = Application.get_env(:yolo, :python) |> System.find_executable()
     detect_script = Application.get_env(:yolo, :detect_script)
-    model = Application.get_env(:yolo, :model, "yolov3")
 
-    port = Port.open({:spawn_executable, python}, [:binary, :nouse_stdio, {:packet, 4}, args: [detect_script, model]])
+    port = Port.open({:spawn_executable, python}, [:binary, :nouse_stdio, {:packet, 4}, args: [detect_script]])
     {:ok, %{port: port, requests: %{}}}
   end
 
 
-  def request_detection(pid, image) do
+  def request_detection(pid, image, model \\"yolov3") do
     # UUID.uuid4(:hex) is 32 bytes
-    request_detection(pid, UUID.uuid4(:hex), image)
+    image_id = UUID.uuid4() |> UUID.string_to_binary!()
+    request_detection(pid, image_id, image, model)
   end
 
-  def request_detection(pid, image_id, image) do
-    GenServer.call(pid, {:detect, image_id, image})
+  def request_detection(pid, image_id, image, model) when byte_size(image_id) == @uuid4_size do
+    GenServer.call(pid, {:detect, image_id, image, @models[model]})
   end
 
   def await(image_id) do
     receive do
-      {:detected, ^image_id, result} -> result
+      {:detected, ^image_id, result} -> Map.put(result, :id, image_id)
     end
   end
 
-  def handle_call({:detect, image_id, image_data}, {from_pid, _}, worker) do
-    Port.command(worker.port, [image_id, image_data])
+  def handle_call({:detect, image_id, image_data, model_byte}, {from_pid, _}, worker) do
+    Port.command(worker.port, [model_byte, image_id, image_data])
     worker = put_in(worker, [:requests, image_id], from_pid)
     {:reply, image_id, worker}
   end
 
 
-  def handle_info({port, {:data, data}}, %{port: port}=worker) do
-    result = Jason.decode!(data) |> get_result()
-    image_id = Map.fetch!(result, :id)
+  def handle_info({port, {:data, <<image_id::binary-size(@uuid4_size), json_string::binary()>>}}, %{port: port}=worker) do
+    result = Jason.decode!(json_string) |> get_result()
     # getting from pid and removing the request from the map
     {from_pid, worker} = pop_in(worker, [:requests, image_id])
     # sending the result map to from_pid
