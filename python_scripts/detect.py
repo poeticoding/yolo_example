@@ -26,16 +26,9 @@ def read_message(input_f):
     
     (total_msg_size,) = unpack("!I", header)
 
-
-    # read requested model
-    model_byte = input_f.read(MODEL_SIZE)
-    model = "yolov3" if model_byte == b'\x00' else "yolov3-tiny"
-
-
     # image id
     image_id = input_f.read(UUID4_SIZE)
-    
-    
+        
     # read image data
     image_data = input_f.read(total_msg_size - UUID4_SIZE - MODEL_SIZE)
 
@@ -43,7 +36,7 @@ def read_message(input_f):
     nparr = np.fromstring(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    return {'id': image_id, 'model': model, 'image': image}
+    return {'id': image_id, 'image': image}
 
 def detect(image, model):
     boxes, labels, _conf = cv.detect_common_objects(image, model=model)
@@ -62,7 +55,7 @@ def write_result(output, image_id, image_shape, boxes, labels):
     output.write(result)
     output.flush()
 
-def run():
+def run(model):
     input_f, output_f = setup_io()
     
     while True:
@@ -74,9 +67,14 @@ def run():
         shape = {'width': width, 'height': height}
 
         #detect object
-        boxes, labels = detect(msg["image"], msg["model"])
+        boxes, labels = detect(msg["image"], model)
 
         #send result back to elixir
         write_result(output_f, msg["id"], shape, boxes, labels)
 
-run()
+if __name__ == "__main__":
+    model = "yolov3"
+    if len(sys.argv) > 1: 
+        model = sys.argv[1]
+        
+    run(model)
