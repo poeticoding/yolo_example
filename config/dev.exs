@@ -68,5 +68,5 @@ config :phoenix, :plug_init_mode, :runtime
 
 config :yolo, Yolo.Worker,
   python: "python", # with Anaconda3 and yolo env is "/opt/anaconda3/envs/yolo/bin/python"
-  detect_script: "python_scripts/detect.py"
+  detect_script: "python_scripts/detect.py",
   model: {:system, "YOLO_MODEL"}
