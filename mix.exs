@@ -40,8 +40,6 @@ defmodule Yolo.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:uuid, "~> 1.1"},
-      {:message_pack, "~> 0.2.0"},
-      {:b64fast, "~> 0.2.2"}
     ]
   end
 end
