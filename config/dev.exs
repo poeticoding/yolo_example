@@ -69,4 +69,3 @@ config :phoenix, :plug_init_mode, :runtime
 # config :yolo, :python, "/opt/anaconda3/envs/yolo/bin/python"
 config :yolo, :python, "python"
 config :yolo, :detect_script, "python_scripts/detect.py"
-config :yolo, :model, "yolov3"
