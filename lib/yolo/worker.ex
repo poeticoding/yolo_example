@@ -20,9 +20,18 @@ defmodule Yolo.Worker do
     
     #loads the values from env variables when {:system, env_var_name}
     |> Enum.map(fn 
+      
+      # it finds the full path when not provided
+      {:python, path} -> {:python, System.find_executable(path)}
+
+      # it loads the value from the environment variable
+      # when the env variable is not set, it defaults to @default_config[option]
       {option, {:system, env_variable}} -> 
         {option, System.get_env(env_variable, @default_config[option])}
+      
+      # all the other options
       config -> config
+    
     end)
     |> Enum.into(%{})
   end
@@ -33,7 +42,7 @@ defmodule Yolo.Worker do
     port = Port.open(
       {:spawn_executable, config.python}, 
       [:binary, :nouse_stdio, {:packet, 4}, 
-      args: [config.detect_script, configmodel]
+      args: [config.detect_script, config.model]
     ])
 
     {:ok, %{port: port, requests: %{}}}
