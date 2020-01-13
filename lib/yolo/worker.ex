@@ -1,6 +1,7 @@
 defmodule Yolo.Worker do
   use GenServer
 
+  @timeout 5_000
   @uuid4_size 16
 
   def start_link(opts \\ []) do
@@ -13,6 +14,7 @@ defmodule Yolo.Worker do
     model = System.get_env("YOLO_MODEL", "yolov3")
 
     port = Port.open({:spawn_executable, python}, [:binary, :nouse_stdio, {:packet, 4}, args: [detect_script, model]])
+
     {:ok, %{port: port, requests: %{}}}
   end
 
@@ -23,13 +25,16 @@ defmodule Yolo.Worker do
     request_detection(pid, image_id, image)
   end
 
+
   def request_detection(pid, image_id, image) when byte_size(image_id) == @uuid4_size do
     GenServer.call(pid, {:detect, image_id, image})
   end
 
-  def await(image_id) do
+  def await(image_id, timeout \\ @timeout) do
     receive do
-      {:detected, ^image_id, result} -> Map.put(result, :id, image_id)
+      {:detected, ^image_id, result} -> result
+    after
+      timeout -> {:detection_timeout, image_id}
     end
   end
 
@@ -41,7 +46,7 @@ defmodule Yolo.Worker do
 
 
   def handle_info({port, {:data, <<image_id::binary-size(@uuid4_size), json_string::binary()>>}}, %{port: port}=worker) do
-    result = Jason.decode!(json_string) |> get_result()
+    result = get_result!(json_string)
     # getting from pid and removing the request from the map
     {from_pid, worker} = pop_in(worker, [:requests, image_id])
     # sending the result map to from_pid
@@ -49,9 +54,10 @@ defmodule Yolo.Worker do
     {:noreply, worker}
   end
 
-  defp get_result(result) do
+
+  defp get_result!(json_string) do
+    result = Jason.decode!(json_string)
     %{
-      id: result["id"],
       shape: %{width: result["shape"]["width"], height: result["shape"]["height"]},
       objects: get_objects(result["labels"], result["boxes"])
     }
