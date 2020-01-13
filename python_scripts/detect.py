@@ -6,7 +6,6 @@ import cvlib as cv
 import json
 
 UUID4_SIZE = 16
-MODEL_SIZE = 1
 
 # setup of FD 3 for input (instead of stdin)
 # FD 4 for output (instead of stdout)
@@ -16,7 +15,6 @@ def setup_io():
 
 def read_message(input_f):
     # reading the first 4 bytes with the length of the data
-    # the first 1 byte is for the model
     # the other 32 bytes are the UUID string, 
     # the rest is the image
 
@@ -25,12 +23,11 @@ def read_message(input_f):
         return None # EOF
     
     (total_msg_size,) = unpack("!I", header)
-
     # image id
     image_id = input_f.read(UUID4_SIZE)
         
     # read image data
-    image_data = input_f.read(total_msg_size - UUID4_SIZE - MODEL_SIZE)
+    image_data = input_f.read(total_msg_size - UUID4_SIZE)
 
     # converting the binary to a opencv image
     nparr = np.fromstring(image_data, np.uint8)
