@@ -8,12 +8,33 @@ defmodule Yolo.Worker do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def init(:ok) do
-    python = Application.get_env(:yolo, :python) |> System.find_executable()
-    detect_script = Application.get_env(:yolo, :detect_script)
-    model = System.get_env("YOLO_MODEL", "yolov3")
+  @default_config [
+    python: "python", 
+    detect_script: "python_scripts/detect.py",
+    model: "yolov3"
+  ]
+  
+  def config do
+    @default_config
+    |> Keyword.merge(Application.get_env(:yolo, __MODULE__, []))
+    
+    #loads the values from env variables when {:system, env_var_name}
+    |> Enum.map(fn 
+      {option, {:system, env_variable}} -> 
+        {option, System.get_env(env_variable, @default_config[option])}
+      config -> config
+    end)
+    |> Enum.into(%{})
+  end
 
-    port = Port.open({:spawn_executable, python}, [:binary, :nouse_stdio, {:packet, 4}, args: [detect_script, model]])
+  def init(:ok) do
+    config = config()
+    
+    port = Port.open(
+      {:spawn_executable, config.python}, 
+      [:binary, :nouse_stdio, {:packet, 4}, 
+      args: [config.detect_script, configmodel]
+    ])
 
     {:ok, %{port: port, requests: %{}}}
   end
