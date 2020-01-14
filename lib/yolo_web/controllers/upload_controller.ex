@@ -7,10 +7,14 @@ defmodule YoloWeb.UploadController do
 
   def create(conn, %{"upload" => upload}=_params) do
     data = File.read!(upload.path)
-    image64 = data |> Base.encode64()
-    image_inline = "data:#{upload.content_type};base64, #{image64}"
-
     detection = Yolo.Worker.request_detection(Yolo.Worker, data) |> Yolo.Worker.await()
-    render(conn, "show.html", image: image_inline, detection: detection)
+
+    base64_image = base64_inline_image(data, upload.content_type)
+    render(conn, "show.html", image: base64_image, detection: detection)
+  end
+
+  defp base64_inline_image(data, content_type) do
+    image64 = Base.encode64(data)
+    "data:#{content_type};base64, #{image64}"
   end
 end
