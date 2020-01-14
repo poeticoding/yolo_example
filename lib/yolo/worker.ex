@@ -14,27 +14,27 @@ defmodule Yolo.Worker do
     model: "yolov3"
   ]
   
-  def config do
-    @default_config
-    |> Keyword.merge(Application.get_env(:yolo, __MODULE__, []))
+def config do
+  @default_config
+  |> Keyword.merge(Application.get_env(:yolo, __MODULE__, []))
+  
+  #loads the values from env variables when {:system, env_var_name}
+  |> Enum.map(fn 
     
-    #loads the values from env variables when {:system, env_var_name}
-    |> Enum.map(fn 
-      
-      # it finds the full path when not provided
-      {:python, path} -> {:python, System.find_executable(path)}
+    # it finds the full path when not provided
+    {:python, path} -> {:python, System.find_executable(path)}
 
-      # it loads the value from the environment variable
-      # when the env variable is not set, it defaults to @default_config[option]
-      {option, {:system, env_variable}} -> 
-        {option, System.get_env(env_variable, @default_config[option])}
-      
-      # all the other options
-      config -> config
+    # it loads the value from the environment variable
+    # when the env variable is not set, it defaults to @default_config[option]
+    {option, {:system, env_variable}} -> 
+      {option, System.get_env(env_variable, @default_config[option])}
     
-    end)
-    |> Enum.into(%{})
-  end
+    # all the other options
+    config -> config
+  
+  end)
+  |> Enum.into(%{})
+end
 
   def init(:ok) do
     config = config()
