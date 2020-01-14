@@ -1,7 +1,7 @@
 defmodule YoloWeb.WebcamChannel do
   use Phoenix.Channel
 
-  def join("detection:" <> _user_id, _params, socket) do
+  def join("webcam:detection", _params, socket) do
     socket =
       socket
       |> assign(:current_request, nil)

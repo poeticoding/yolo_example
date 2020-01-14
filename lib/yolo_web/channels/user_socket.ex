@@ -2,7 +2,7 @@ defmodule YoloWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "detection:*", YoloWeb.WebcamChannel
+  channel "webcam:*", YoloWeb.WebcamChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

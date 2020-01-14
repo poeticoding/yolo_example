@@ -1,5 +1,6 @@
-<video autoplay></video>
-<canvas style="display:none;"></canvas>
-
-<button id="toggle_button">Start/Stop</button>
+<button id="start_stop">Start</button>
+<div class="camera-container scaled-camera">
+    <div id="camera"></div>
+    <canvas id="objects" width="1280" height="720"></canvas>
+</div>
 

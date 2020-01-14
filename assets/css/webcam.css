@@ -1,0 +1,30 @@
+.camera-container {
+	position: relative;
+	margin-left: -30%;
+}
+
+#camera {
+	position: absolute;
+	width:1280px; 
+	height:720px; 
+	top: 0px; 
+	left: 0px;
+	z-index:1;
+}
+
+canvas#objects {
+	position: absolute;
+	width:1280px; 
+	height:720px; 
+	top: 0px; 
+	left: 0px;
+	z-index:100;
+} 
+
+.scaled-camera {
+	transform: scale(0.6);
+}
+
+button#start_stop {
+	display: block
+}

@@ -14,7 +14,8 @@ import "phoenix_html"
 // Import local files
 //
 // Local files can be imported directly using relative paths, for example:
-// import socket from "./socket"
+import socket from "./socket"
 
-import "./detection"
+import {hasCameraElement, setupWebcamAndDetection} from "./webcam"
 
+if(hasCameraElement()) setupWebcamAndDetection(socket);
