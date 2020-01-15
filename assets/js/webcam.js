@@ -1,5 +1,7 @@
 import Webcam from "webcamjs"
 
+const FPS = 1; // frames per second
+
 export function setupWebcamAndDetection(socket) {
 
   let channel = socket.channel("webcam:detection", {})
@@ -60,7 +62,6 @@ export function setupWebcamAndDetection(socket) {
   }
 
   //toggle button starts and stops an interval
-  const FPS = 30; // frames per second
   let intervalID = null;
 
   document.getElementById("start_stop")
