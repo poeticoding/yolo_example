@@ -1,21 +1,3 @@
-# defmodule YoloWeb.WebcamChannel do
-#   use Phoenix.Channel
-
-#   def join("webcam:detection", _params, socket) do
-#     {:ok, socket}
-#   end
-
-#   def handle_in("frame", %{"frame" => "data:image/jpeg;base64,"<> base64frame}=_event, socket) do
-#     frame = Base.decode64!(base64frame)
-#     Yolo.Worker.request_detection(Yolo.Worker, frame)
-#     {:noreply, socket}
-#   end
-
-#   def handle_info({:detected, _image_id, result}, socket) do
-#     push(socket, "detected", result)
-#   end
-# end
-
 defmodule YoloWeb.WebcamChannel do
   use Phoenix.Channel
 
