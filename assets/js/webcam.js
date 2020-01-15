@@ -60,7 +60,7 @@ export function setupWebcamAndDetection(socket) {
   }
 
   //toggle button starts and stops an interval
-  const FPS = 1; // frames per second
+  const FPS = 30; // frames per second
   let intervalID = null;
 
   document.getElementById("start_stop")
