@@ -7,7 +7,7 @@ In this repository ([part1](https://github.com/poeticoding/yolo_example/tree/par
 
 ## Python
 
-This version uses [Elixir Port](), which takes care of launching and communicating with [`python_scripts/detect.py`](python_scripts/detect.py). Be sure you have Python 3.6 installed, along with the libraries you find in [`python_scripts/requirements`](python_scripts/requirements.txt).
+This version uses [Elixir Port](https://hexdocs.pm/elixir/Port.html), which takes care of launching and communicating with [`python_scripts/detect.py`](python_scripts/detect.py). Be sure you have Python 3.6 installed, along with the libraries you find in [`python_scripts/requirements`](python_scripts/requirements.txt).
 
 ## Phoenix
 
@@ -20,7 +20,7 @@ config :yolo, Yolo.Worker,
   model: {:system, "YOLO_MODEL"}
 ```
 
-* `:python` is the path of your python 3.6 executable
+* `:python` is the path of your python3.6 executable
 * `:detect_script` is the path of the [`detect.py`](python_scripts/detect.py) script.
 * just leave `:model` set to `{:system, "YOLO_MODEL"}` - it will load the model name from the `YOLO_MODEL` environment variable.
 
